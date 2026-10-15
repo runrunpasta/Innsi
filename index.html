@@ -152,37 +152,27 @@ ol.note li{margin:.2em 0}
       <p class="status" id="ruleStatus"></p>
     </section>
 
-    <div class="seg three" id="stageNav" role="group" aria-label="手順">
-      <button type="button" id="btnStage1" aria-pressed="true">1 画像結合</button>
-      <button type="button" id="btnStage2" aria-pressed="false" disabled>2 仮採点</button>
-      <button type="button" id="btnStage3" aria-pressed="false" disabled>3 手動修正</button>
+    <div class="seg two" id="stageNav" role="group" aria-label="手順">
+      <button type="button" id="btnStage1" aria-pressed="true">1 読み取り+仮採点</button>
+      <button type="button" id="btnStage2" aria-pressed="false" disabled>2 手動修正</button>
     </div>
 
     <div id="stage1">
       <section class="card" aria-labelledby="h-shots">
         <span class="step">手順1</span>
-        <h2 id="h-shots">画像結合</h2>
-        <p class="note">継承画面の連続したスクショを、上から順に選びます(2〜3枚)。重なっているところを見つけて、1枚の縦長の画像につなげます。</p>
+        <h2 id="h-shots">読み取り+仮採点</h2>
+        <p class="note">継承画面のスクショを選びます(複数枚OK)。画像はつなげず、1枚ずつ白因子の部分だけを読み取って、同じ名前はまとめます。</p>
         <input type="file" id="files" accept="image/png,image/jpeg,image/webp" multiple>
         <div class="thumbs" id="thumbs"></div>
-        <div class="btn-row"><button class="btn" id="run" disabled>画像をつなげる</button></div>
+        <div class="btn-row"><button class="btn" id="run" disabled>読み取って仮採点する</button><button class="btn ghost" id="stop" hidden>止める</button></div>
         <p class="status" id="runStatus" aria-live="polite"></p>
-        <div id="mergedWrap" hidden><p class="sub">つなげた画像(確認用)</p><div class="merged" id="merged"></div><p class="note" id="mergeInfo"></p>
-          <div class="btn-row"><button class="btn" id="goOcr" type="button">この画像で仮採点へ</button></div></div>
       </section>
-    </div>
-
-    <div id="stage2" hidden>
-      <section class="card" aria-labelledby="h-prov">
-        <span class="step">手順2</span>
+      <section class="card" id="provBox" hidden aria-labelledby="h-prov">
         <h2 id="h-prov">仮採点</h2>
-        <div class="btn-row"><button class="btn" id="rerun" type="button">もう一度読み取る</button><button class="btn ghost" id="stop" hidden>止める</button></div>
-        <p class="status" id="ocrStatus" aria-live="polite"></p>
-        <div id="provBox" hidden>
-          <div class="total"><span class="n" id="provTotal">0</span><span class="u">点(仮)</span><span class="sub" id="provCtx"></span></div>
-          <p class="note">読み取れたスキルだけで数えた点数です。違いや不足は、次の「手動修正」で直せます。</p>
-          <ul class="list" id="provList"></ul>
-        </div>
+        <div class="total"><span class="n" id="provTotal">0</span><span class="u">点(仮)</span><span class="sub" id="provCtx"></span></div>
+        <p class="note">読み取れたスキルだけで数えた点数です。違いや不足は、次の「手動修正」で直せます。</p>
+        <ul class="list" id="provList"></ul>
+        <div class="btn-row"><button class="btn" id="goStage2" type="button">手動修正へ</button></div>
       </section>
       <section class="card" id="ocrCard" hidden aria-labelledby="h-ocr">
         <h2 id="h-ocr">読み取った文字と照合</h2>
@@ -194,17 +184,15 @@ ol.note li{margin:.2em 0}
         <div class="btn-row"><button class="btn ghost" id="copyFound" type="button">見つかったスキルをコピー</button></div>
         <details><summary class="sub">読み取った範囲(白因子の帯だけ)</summary><div class="merged" id="range"></div></details>
         <details><summary class="sub">補助の読み取り(判定だけに使います)</summary><pre class="dump" id="ocrExtra"></pre></details>
-        <div class="btn-row"><button class="btn" id="goStage3" type="button">手動修正へ</button></div>
-        <div class="btn-row"><button class="btn ghost" id="backStage1" type="button">画像結合に戻る</button></div>
       </section>
     </div>
 
-    <div id="stage3" hidden>
+    <div id="stage2" hidden>
       <section class="card" id="resultCard" aria-labelledby="h-res">
-        <span class="step">手順3</span>
+        <span class="step">手順2</span>
         <h2 id="h-res">手動修正</h2>
         <div class="total"><span class="n" id="total">0</span><span class="u">点</span><span class="sub" id="totalCtx"></span></div>
-        <p class="note">仮採点で見つかったスキルには、最初からチェックが入っています。違うものは外してください。画像にあるのに見つかっていないものは、下の「不足分を手動で追加」でチェックを入れてください。</p>
+        <p class="note">読み取りで見つかったスキルには、最初からチェックが入っています。違うものは外してください。画像にあるのに見つかっていないものは、下の「不足分を手動で追加」でチェックを入れてください。</p>
         <label class="field" for="hitSearch">因子名で探す
           <input type="search" id="hitSearch" placeholder="例: 存在感" autocomplete="off">
         </label>
@@ -212,12 +200,12 @@ ol.note li{margin:.2em 0}
           <button class="btn ghost" id="resetAuto" type="button">文字から見つかった分に戻す</button>
           <button class="btn ghost" id="clearAll" type="button">全部外す</button>
         </div>
-        <h3 class="sub" style="margin-top:12px">仮採点で見つかったスキル <span id="cntHit"></span></h3>
+        <h3 class="sub" style="margin-top:12px">読み取りで見つかったスキル <span id="cntHit"></span></h3>
         <ul class="list" id="hit"></ul>
         <h3 class="sub" style="margin-top:12px">不足分を手動で追加(チェックを入れると加点) <span id="cntMore"></span></h3>
         <ul class="list" id="hitMore"></ul>
         <div class="btn-row"><button class="btn ghost" id="copyRes" type="button">結果をコピー</button></div>
-        <div class="btn-row"><button class="btn ghost" id="backStage2" type="button">仮採点に戻る</button></div>
+        <div class="btn-row"><button class="btn ghost" id="backStage1" type="button">読み取り+仮採点に戻る</button></div>
       </section>
     </div>
 
@@ -557,7 +545,7 @@ async function decodeCfg(code) {
 }
 /*LOGIC-END*/
 
-  var VERSION = "2026-10-15b(1行ずつ読み取り)";
+  var VERSION = "2026-10-15c(結合なし・2段階)";
   var $ = function (s) { return document.querySelector(s); };
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function toast(t) { var el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function () { el.hidden = true; }, 2400); }
@@ -565,7 +553,7 @@ async function decodeCfg(code) {
   var SKEY = "inh-scorer-v2", VKEY = "inh-scorer-view-v2";
   var sel = { month: new Date().getMonth() + 1, style: "先行" };
   var store = null, pending = null, view = "app";
-  var files = [], thumbUrls = [], lastOcr = null, mergedCv = null, running = false, worker = null, stopped = false;
+  var files = [], thumbUrls = [], lastOcr = null, running = false, worker = null, stopped = false;
 
   /* ---------- この端末への保存 ---------- */
   function loadStore() {
@@ -644,13 +632,11 @@ async function decodeCfg(code) {
     $("#thumbs").innerHTML = files.map(function (f, i) {
       var u = URL.createObjectURL(f); thumbUrls.push(u);
       return '<div class="shot"><img src="' + u + '" alt="' + (i + 1) + '枚目"><span class="sub">' + (i + 1) + '枚目</span><span class="mv">' +
-        '<button type="button" class="btn ghost" data-mv="-1" data-i="' + i + '"' + (i === 0 ? " disabled" : "") + '>↑</button>' +
-        '<button type="button" class="btn ghost" data-mv="1" data-i="' + i + '"' + (i === files.length - 1 ? " disabled" : "") + '>↓</button>' +
         '<button type="button" class="btn ghost del" data-rm="' + i + '">✕</button></span></div>';
     }).join("");
     updateRun();
   }
-  $("#files").addEventListener("change", function (e) { files = Array.prototype.slice.call(e.target.files || []); $("#mergedWrap").hidden = true; renderShots(); });
+  $("#files").addEventListener("change", function (e) { files = Array.prototype.slice.call(e.target.files || []); renderShots(); });
   $("#thumbs").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b || running) return;
     var i = Number(b.getAttribute("data-i"));
@@ -888,31 +874,13 @@ async function decodeCfg(code) {
   }
   /* 手順2へ行くときの画面の切り替え */
   function showStage(n) {
-    $("#stage1").hidden = n !== 1; $("#stage2").hidden = n !== 2; $("#stage3").hidden = n !== 3;
-    [1, 2, 3].forEach(function (k) { $("#btnStage" + k).setAttribute("aria-pressed", String(n === k)); });
-    $("#btnStage2").disabled = !mergedCv; $("#btnStage3").disabled = !lastOcr;
-    if (n === 3) renderResult();
+    $("#stage1").hidden = n !== 1; $("#stage2").hidden = n !== 2;
+    [1, 2].forEach(function (k) { $("#btnStage" + k).setAttribute("aria-pressed", String(n === k)); });
+    $("#btnStage2").disabled = !lastOcr;
+    if (n === 2) renderResult();
   }
   function resetOcr() {
     lastOcr = null; $("#ocrText").value = ""; $("#ocrCard").hidden = true; $("#provBox").hidden = true; showStage(1);
-  }
-  async function run() {
-    if (!files.length || running) return;
-    running = true; updateRun();
-    var st = $("#runStatus");
-    try {
-      st.textContent = "画像をつなげています…";
-      var sti = await combineFiles(files);
-      mergedCv = sti.canvas; lastOcr = null; $("#ocrCard").hidden = true; $("#provBox").hidden = true;
-      var box = $("#merged"); box.innerHTML = ""; sti.canvas.style.width = "100%"; box.appendChild(sti.canvas);
-      $("#mergedWrap").hidden = false;
-      $("#mergeInfo").textContent = files.length < 2 ? "画像が1枚なので、そのまま表示しています。" :
-        "つなぎ目 " + (sti.found + sti.miss) + " か所のうち、重なりを見つけて合わせたのは " + sti.found + " か所です。" +
-        (sti.miss ? "見つからなかった所は、そのまま下につなげています。" : "");
-      st.textContent = "つなげました。画像を確認して、「この画像で仮採点へ」を押してください。";
-      showStage(1);
-    } catch (e) { st.textContent = "画像をつなげられませんでした。別の画像で試してください。"; }
-    finally { running = false; updateRun(); }
   }
   /* 白い帯の中で、文字(こげ茶色)がある行を1行ずつ見つける。星や丸いボタンは除く */
   function isInk(r, g, b) { return (r * 299 + g * 587 + b * 114) / 1000 < 150 && r - b > 25; }
@@ -955,48 +923,50 @@ async function decodeCfg(code) {
     return { gray: wrap(src), ink: wrap(mk) };
   }
   async function runOcr() {
-    if (!mergedCv || running) return;
+    if (!files.length || running) return;
     running = true; stopped = false; updateRun();
-    $("#stop").hidden = false; $("#ocrCard").hidden = true; $("#provBox").hidden = true;
-    var st = $("#ocrStatus"), sti = { canvas: mergedCv };
+    $("#stop").hidden = false; $("#ocrCard").hidden = true; $("#provBox").hidden = true; lastOcr = null; showStage(1);
+    var st = $("#runStatus");
     try {
       st.textContent = "文字認識の準備中です。初回は言語データの読み込みに1〜2分かかることがあります…";
       await loadTesseract();
-      var wb = whiteBars(sti.canvas), passes, got = [], cutY = Infinity, p;
-      if (wb.rects.length) {
-        var rg = $("#range"); if (rg) { rg.innerHTML = ""; wb.cv.style.width = "100%"; rg.appendChild(wb.cv); }
-        var full = prepCanvas(wb.cv), sc = full.width / wb.cv.width;
-        var bands = [];
-        wb.rects.forEach(function (r) { textBands(sti.canvas, r).forEach(function (b) { bands.push(b); }); });
-        if (bands.length >= 3) {
-          passes = [];
-          bands.forEach(function (b, n) {
-            var v = lineVariants(sti.canvas, b);
-            passes.push({ cv: v.gray, psm: "7", label: "1行ずつ " + (n + 1) + "/" + bands.length, main: true });
-            passes.push({ cv: v.ink, psm: "7", label: "1行ずつ(文字だけ) " + (n + 1) + "/" + bands.length, main: false });
-          });
-          wb.rects.forEach(function (r, n) { passes.push({ cv: cropBox(full, r, sc), psm: "6", label: "白因子の帯 " + (n + 1) + "(補助)", main: false }); });
+      var passes = [], got = [], cutY = {}, hasRects = {}, p, fi, rg = $("#range"); rg.innerHTML = "";
+      for (fi = 0; fi < files.length; fi++) {
+        st.textContent = "画像 " + (fi + 1) + "/" + files.length + " の読み取り範囲を探しています…";
+        var bm = await loadBitmap(files[fi]), Wt = Math.min(1400, bm.width), cvs = document.createElement("canvas");
+        cvs.width = Wt; cvs.height = Math.max(1, Math.round(bm.height * Wt / bm.width));
+        cvs.getContext("2d").drawImage(bm, 0, 0, cvs.width, cvs.height);
+        var tag = "画像" + (fi + 1) + " ", wb = whiteBars(cvs);
+        hasRects[fi] = wb.rects.length > 0;
+        if (wb.rects.length) {
+          var pv = document.createElement("div"); pv.innerHTML = '<p class="note">' + tag + '</p>'; wb.cv.style.width = "100%"; pv.appendChild(wb.cv); rg.appendChild(pv);
+          var full = prepCanvas(wb.cv), sc = full.width / wb.cv.width, bands = [];
+          wb.rects.forEach(function (r) { textBands(cvs, r).forEach(function (b) { bands.push(b); }); });
+          if (bands.length >= 3) {
+            bands.forEach(function (b, n) {
+              var v = lineVariants(cvs, b);
+              passes.push({ cv: v.gray, psm: "7", fi: fi, label: tag + (n + 1) + "/" + bands.length + "行目", main: true });
+              passes.push({ cv: v.ink, psm: "7", fi: fi, label: tag + (n + 1) + "/" + bands.length + "行目(文字だけ)", main: false });
+            });
+            wb.rects.forEach(function (r, n) { passes.push({ cv: cropBox(full, r, sc), psm: "6", fi: fi, label: tag + "帯" + (n + 1) + "(補助)", main: false }); });
+          } else {
+            wb.rects.forEach(function (r, n) { passes.push({ cv: cropBox(full, r, sc), psm: "6", fi: fi, label: tag + "帯" + (n + 1), main: true }); });
+            passes.push({ cv: full, psm: "11", fi: fi, label: tag + "全体(補助)", main: false });
+          }
         } else {
-          passes = wb.rects.map(function (r, n) {
-            return { cv: cropBox(full, r, sc), psm: "6", label: "白因子の帯 " + (n + 1), main: true };
-          });
-          passes.push({ cv: full, psm: "11", label: "全体(補助)", main: false });
+          var pv2 = document.createElement("p"); pv2.className = "note"; pv2.textContent = tag + ": 白因子の帯を見つけられなかったので、画像全体から読み取ります。"; rg.appendChild(pv2);
+          var full2 = prepCanvas(cvs), gx = findGap(full2), m = Math.round(full2.width * 0.004);
+          passes.push({ cv: cropRect(full2, 0, gx - m), psm: "6", fi: fi, label: tag + "左の列", main: true });
+          passes.push({ cv: cropRect(full2, gx + m, full2.width), psm: "6", fi: fi, label: tag + "右の列", main: true });
+          passes.push({ cv: full2, psm: "11", fi: fi, label: tag + "全体(補助)", main: false });
         }
-      } else {
-        var rg2 = $("#range"); if (rg2) rg2.innerHTML = '<p class="note">白因子の帯を見つけられなかったので、画像全体から読み取ります。</p>';
-        var full2 = prepCanvas(sti.canvas), gx = findGap(full2), m = Math.round(full2.width * 0.004);
-        passes = [
-          { cv: cropRect(full2, 0, gx - m), psm: "6", label: "左の列", main: true },
-          { cv: cropRect(full2, gx + m, full2.width), psm: "6", label: "右の列", main: true },
-          { cv: full2, psm: "11", label: "全体(補助)", main: false }
-        ];
       }
       worker = await Tesseract.createWorker("jpn", 1, {});
       for (p = 0; p < passes.length; p++) {
         if (stopped) break;
-        st.textContent = "文字を読み取っています(" + passes[p].label + " " + (p + 1) + "/" + passes.length + ")…";
+        st.textContent = "文字を読み取っています(" + passes[p].label + " / 全体 " + (p + 1) + "/" + passes.length + ")…";
         var ls = await ocrLines(passes[p].cv, passes[p].psm);
-        ls.forEach(function (l) { if (!wb.rects.length && l.y !== null && /承元|継承元/.test(norm(l.t))) cutY = Math.min(cutY, l.y); });
+        ls.forEach(function (l) { var f0 = passes[p].fi; if (!hasRects[f0] && l.y !== null && /承元|継承元/.test(norm(l.t))) cutY[f0] = Math.min(cutY[f0] === undefined ? Infinity : cutY[f0], l.y); });
         got.push({ p: passes[p], ls: ls });
       }
       try { await worker.terminate(); } catch (e) {}
@@ -1004,8 +974,9 @@ async function decodeCfg(code) {
       var transcript = [], extra = [], seen = {};
       got.forEach(function (g) {
         var ls = g.ls;
-        if (wb.rects.length) { /* 範囲は色で決めてあるので、そのまま使う */ }
-        else if (cutY < Infinity && ls.length && ls[0].y !== null) ls = ls.filter(function (l) { return l.y < cutY - 2; });
+        var cy = cutY[g.p.fi] === undefined ? Infinity : cutY[g.p.fi];
+        if (hasRects[g.p.fi]) { /* 範囲は色で決めてあるので、そのまま使う */ }
+        else if (cy < Infinity && ls.length && ls[0].y !== null) ls = ls.filter(function (l) { return l.y < cy - 2; });
         else { var k; for (k = 0; k < ls.length; k++) if (/承元|継承元/.test(norm(ls[k].t))) { ls = ls.slice(0, k); break; } }
         ls.forEach(function (l) {
           var kk = norm(l.t); if (kk.length < 2) return;
@@ -1021,8 +992,7 @@ async function decodeCfg(code) {
         $("#ocrExtra").textContent = extra.join("\n");
         $("#ocrCard").hidden = false;
         foundFromDict();
-        st.textContent = "読み取りが終わりました。仮採点と、下の照合結果を確認してください。";
-        showStage(2);
+        st.textContent = "読み取りが終わりました。下の仮採点と照合結果を確認してください。";
       }
     } catch (e) {
       st.textContent = "読み取りに失敗しました。通信状態を確認して、もう一度押してください。";
@@ -1032,9 +1002,7 @@ async function decodeCfg(code) {
       running = false; $("#stop").hidden = true; updateRun();
     }
   }
-  $("#run").addEventListener("click", run);
-  $("#goOcr").addEventListener("click", function () { showStage(2); if (!lastOcr) runOcr(); });
-  $("#rerun").addEventListener("click", runOcr);
+  $("#run").addEventListener("click", runOcr);
   $("#stop").addEventListener("click", async function () { stopped = true; try { if (worker) await worker.terminate(); } catch (e) {} });
   function foundFromDict() {
     var ls = $("#ocrText").value.split(/\r?\n/).map(function (t) { return t.trim(); }).filter(Boolean);
@@ -1083,18 +1051,16 @@ async function decodeCfg(code) {
     var t = foundFromDict().join("\n");
     try { navigator.clipboard.writeText(t).then(function () { toast("コピーしました"); }, function () { toast("コピーできませんでした"); }); } catch (e) { toast("コピーできませんでした"); }
   });
-  $("#goStage3").addEventListener("click", function () {
+  $("#goStage2").addEventListener("click", function () {
     var ls = $("#ocrText").value.split(/\r?\n/).map(function (t) { return t.trim(); }).filter(Boolean);
     if (!ls.length) { toast("文字がありません。先に画像を読み取ってください"); return; }
     if (!lastOcr) lastOcr = { lines: [], manual: {} };
     lastOcr.lines = ls; foundFromDict();
-    showStage(3);
+    showStage(2);
   });
   $("#btnStage1").addEventListener("click", function () { showStage(1); });
-  $("#btnStage2").addEventListener("click", function () { if (mergedCv) { showStage(2); if (!lastOcr && !running) runOcr(); } });
-  $("#btnStage3").addEventListener("click", function () { if (lastOcr) showStage(3); });
+  $("#btnStage2").addEventListener("click", function () { if (lastOcr) showStage(2); });
   $("#backStage1").addEventListener("click", function () { showStage(1); });
-  $("#backStage2").addEventListener("click", function () { showStage(2); });
 
   if (location.search.indexOf("debug") >= 0) window.__dbg = { textBands: textBands, lineVariants: lineVariants, whiteBars: whiteBars, prepCanvas: prepCanvas, findGap: findGap, cropRect: cropRect, combineFiles: combineFiles };
 
